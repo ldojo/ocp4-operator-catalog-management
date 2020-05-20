@@ -1,0 +1,1 @@
+# ocp-operator-catalog-pipeline
