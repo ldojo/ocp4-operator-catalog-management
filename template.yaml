@@ -1,0 +1,144 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: operator-registry
+  annotations:
+    description: "A template to instantiate an operator registry catalog from manifests in Artifactory"
+    tags: "artifactory,operators,registry,catalog"
+labels:
+  app: ${NAME} 
+parameters:
+- description: "Name of Operator Catalog -- will be applied to labels on all dependent objects"
+  name: NAME
+  required: true
+- description: "Random 4 char string to append to NAME"
+  name: RANDOM
+  generate: expression
+  from: "[a-zA-Z0-9]{5}"
+- description: "The URL of the .tar.gz file containing operator manifests in Artifactory"
+  name: EAR_OPERATOR_MANIFESTS_URL
+  required: true
+- description: "The image tag of the operator-registry"
+  name: "IMAGE"
+  required: true
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      opsrc-owner-name: ${NAME}
+      opsrc-owner-namespace: openshift-marketplace
+    name: ${NAME}
+  spec:
+    ports:
+    - name: grpc
+      port: 50051
+      protocol: TCP
+      targetPort: 50051
+    selector:
+      marketplace.operatorSource: ${NAME}
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: extensions/v1beta1
+  kind: Deployment
+  metadata:
+    labels:
+      opsrc-owner-name: ${NAME}
+      opsrc-owner-namespace: openshift-marketplace
+    name: ${NAME}
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        marketplace.operatorSource: ${NAME}
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          marketplace.operatorSource: ${NAME}
+        name: ${NAME}
+        namespace: openshift-marketplace
+      spec:
+        containers:
+        - env:
+          - name: HTTP_PROXY
+          - name: HTTPS_PROXY
+          - name: NO_PROXY
+          - name: EAR_OPERATOR_MANIFESTS_URL
+            value: "${EAR_OPERATOR_MANIFESTS_URL}" 
+          image: ${IMAGE} 
+          imagePullPolicy: Always
+          livenessProbe:
+            exec:
+              command:
+              - grpc_health_probe
+              - -addr=localhost:50051
+            failureThreshold: 30
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: ${NAME}
+          ports:
+          - containerPort: 50051
+            name: grpc
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - grpc_health_probe
+              - -addr=localhost:50051
+            failureThreshold: 30
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            requests:
+              cpu: 10m
+              memory: 100Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/pki/ca-trust/extracted/pem/
+            name: marketplace-trusted-ca
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          beta.kubernetes.io/os: linux
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            items:
+            - key: ca-bundle.crt
+              path: tls-ca-bundle.pem
+            name: marketplace-trusted-ca
+          name: marketplace-trusted-ca
+- apiVersion: operators.coreos.com/v1alpha1
+  kind: CatalogSource
+  metadata:
+    labels:
+      olm-visibility: hidden
+      openshift-marketplace: "true"
+      opsrc-datastore: "true"
+      opsrc-owner-name: ${NAME} 
+      opsrc-owner-namespace: openshift-marketplace
+      opsrc-provider: ${NAME}
+    name: ${NAME}
+  spec:
+    address: ${NAME}.openshift-marketplace.svc:50051
+    displayName: ${NAME} 
+    icon:
+      base64data: ""
+      mediatype: ""
+    publisher: Citi
+    sourceType: grpc
