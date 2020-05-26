@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ -z "$EAR_OPERATOR_MANIFESTS_URL" ]
+then 
+	echo "\$EAR_OPERATOR_MANIFESTS_URL is not set. It is needed to fetch the operator manifests from EAR. cannot proceed, exiting"
+	exit 1
+fi
+
+mkdir /tmp/manifests
+cd /tmp/manifests
+curl -uadmin:AP75wUAsRv7ZX8nS8zDCa4Xbz5v  "$EAR_OPERATOR_MANIFESTS_URL" | tar zxv
+
+/bin/initializer -o /tmp/bundles.db
+
+/bin/registry-server --database /tmp/bundles.db
