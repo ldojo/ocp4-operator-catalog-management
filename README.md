@@ -1,5 +1,11 @@
 # ocp-operator-catalog-pipeline
 
+start artifactory container:
+```
+podman run --name artifactory -d -v /opt/jfrog/artifactory:/var/opt/jfrog/artifactory --ulimit nofile=90000:90000 -p 8081:8081 docker.bintray.io/jfrog/artifactory-pro:6.16.2
+```
+
+
 To disable the default catalog sources:
 ```
 oc patch OperatorHub cluster --type json     -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": false}]'
