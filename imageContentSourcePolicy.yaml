@@ -1,0 +1,11 @@
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: etcd-operator
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - 10.0.0.14:8081/quay.io/opstree
+      source: quay.io/opstree
+    - 10.0.0.14:8081/quay.io/coreos
+      source: quay.io/coreos
