@@ -22,7 +22,28 @@ oc patch --type=merge --patch='{
   }
 }' image.config.openshift.io/cluster
 ```
+and do this on the crc vm:
 
+```
+$ crc ip
+192.168.64.92
+
+$ ssh -i ~/.crc/machines/crc/id_rsa -o StrictHostKeyChecking=no core@192.168.64.92
+
+<CRC-VM> $ sudo cat /etc/containers/registries.conf 
+unqualified-search-registries = ['registry.access.redhat.com', 'docker.io']
+
+[[registry]]
+  location = "my.insecure.registry.com:8888"
+  insecure = true
+  blocked = false
+  mirror-by-digest-only = false
+  prefix = ""
+
+<CRC-VM> $ sudo systemctl restart crio
+<CRC-VM> $ sudo systemctl restart kubelet
+<CRC-VM> $ exit
+```
 
 To disable the default catalog sources:
 ```
