@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 if [ -z "$EAR_OPERATOR_MANIFESTS_URL" ]
 then 
