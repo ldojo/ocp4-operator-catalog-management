@@ -8,7 +8,7 @@ fi
 
 mkdir /tmp/manifests
 cd /tmp/manifests
-curl ${CURL_EAR_CREDS}  "${EAR_OPERATOR_MANIFESTS_URL}" | tar zxv
+curl ${CURL_EAR_CREDS}  "${EAR_OPERATOR_MANIFESTS_URL}" | tar zxv || echo "fetching the artifactory archive failed. check the CURL_EAR_CREDS arg value. exiting" && exit 1
 
 /bin/initializer -o /tmp/bundles.db
 
