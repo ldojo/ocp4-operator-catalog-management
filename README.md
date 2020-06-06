@@ -52,7 +52,7 @@ unqualified-search-registries = ['registry.access.redhat.com', 'docker.io']
 
 To disable the default catalog sources:
 ```
-oc patch OperatorHub cluster --type json     -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": false}]'
+oc patch OperatorHub cluster --type json     -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
 ```
 
 Make sure the pull secret is in place for artifactory:
