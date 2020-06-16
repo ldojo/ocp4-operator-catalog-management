@@ -1,6 +1,11 @@
-FROM registry.redhat.io/openshift4/ose-operator-registry:v4.3 AS builder
+ARG OPERATOR_REGISTRY_BASE_IMAGE=registry.redhat.io/openshift4/ose-operator-registry:v4.3
+ARG UBI_OR_BASE_IMAGE=registry.access.redhat.com/ubi8/ubi
 
-FROM registry.access.redhat.com/ubi8/ubi
+FROM ${OPERATOR_REGISTRY_BASE_IMAGE} AS builder
+
+FROM ${UBI_OR_BASE_IMAGE}
+
+LABEL maintainer="Lev Shulman <lshulman@redhat.com>"
 
 COPY --from=builder /bin/initializer /bin/initializer
 #COPY --from=builder /registry/bundles.db /bundles.db
