@@ -8,7 +8,6 @@ FROM ${UBI_OR_BASE_IMAGE}
 LABEL maintainer="Lev Shulman <lshulman@redhat.com>"
 
 COPY --from=builder /bin/initializer /bin/initializer
-#COPY --from=builder /registry/bundles.db /bundles.db
 COPY --from=builder /usr/bin/registry-server /bin/registry-server
 COPY --from=builder /bin/grpc_health_probe /bin/grpc_health_probe
 
