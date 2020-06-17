@@ -8,17 +8,15 @@ FROM ${UBI_OR_BASE_IMAGE}
 LABEL maintainer="Lev Shulman <lshulman@redhat.com>"
 
 COPY --from=builder /bin/initializer /bin/initializer
-#COPY --from=builder /registry/bundles.db /bundles.db
 COPY --from=builder /usr/bin/registry-server /bin/registry-server
 COPY --from=builder /bin/grpc_health_probe /bin/grpc_health_probe
 
-COPY scripts /tmp/scripts
+COPY scripts /opt/scripts
 
-RUN chmod 775 /tmp/scripts/initialize
+RUN chmod a+x /opt/scripts/initialize
 
 EXPOSE 50051
 
 
-#ENTRYPOINT ["/tmp/scripts/initialize", "$EAR_OPERATOR_MANIFESTS_URL"]
+ENTRYPOINT ["/opt/scripts/initialize", "$EAR_OPERATOR_MANIFESTS_URL"]
 
-CMD ["/tmp/scripts/initialize", "$EAR_OPERATOR_MANIFESTS_URL"]
