@@ -31,7 +31,7 @@ With the image built, push it to the proper docker registry where an Openshift d
 
 NOTE: we do this pre-req step to build the ose-operator-registry image only once. once it is deployed, we don't need to rebuild it. It acts as a "container" for the operator listing the OperatorHub interface will provide, but we won't need to rebuild it to change the listing of operators. We point the container to the proper tar.gz package manifest archive to fetch and load instead. 
 
-#### Day 1
+#### Day 1: 
 
 Suppose you want to start with an Operator catalog of all of the current Red Hat Operators. You can fetch all of the operators' package manifests like so, to a directory named `redhat-manifests`:
 ```
@@ -77,4 +77,23 @@ You should see a Service, CatalogSource, and Deployment (with corresponding Pod)
 Once the Pod is up and running, go to the OperatorHub menu item in your Openshift UI Console, and you should see your Operator listing there
 
 
+#### Day 2: Update the Catalog
 
+With day one behind us, and all redhat-operators available in the Openshift 4 cluster , suppose you realize you need to curate the list of Operators a bit. Perhaps there is a newer version of the AMQ Operator out, and you want to update... or, you just want to pair down the list considerably for deployment into a different (STAGE/PROD) Openshift 4 cluster. To do this, we:
+1. change the contents of redhat-manifests, and build a new tar.gz file (notice the filename is different with *1.0.1* instead of *1.0.0*)
+```
+tar zcvf operator-catalog-v1.0.1.tar.gz redhat-manifests
+```
+
+2. as before, push the file to your artifact repo (for example, for Artifactory):
+```
+curl -umyuser:mypassword -T operator-catalog-v1.0.1.tar.gz "http://artifactory-host:<port>/artifactory/ocp-catalog-dev/operator-catalog-v1.0.1.tar.gz"
+```
+
+3. If the operator catalog is already running in the target Openshift Cluster, as we deployed in on Day 1, there is no need to delete the CatalogSource/Deployment/Service we created -- just update the Deployment's MANIFEST_ARCHIVE_URL environment variable via CLI or UI Console. The Rolling Deployment will spin up a new pod pointing to our new tar.gz file, and load the new listing. If you're deploying to a new Openshift Cluster where the catalog has not bee deployed yet, just run the same command but pointing to the v1.0.1 archive with 
+```
+MANIFEST_ARCHIVE_URL=http://artifactory-host:<port>/artifactory/ocp-catalog-dev/operator-catalog-v1.0.1.tar.gz
+oc process -f operator-registry-template.yaml -p NAME=${NAME} -p MANIFEST_ARCHIVE_URL="${MANIFEST_ARCHIVE_URL}" -p CURL_FETCH_CREDS="${CURL_FETCH_CREDS}" -p IMAGE=${OP_CATALOG_IMAGE} | oc create -f -
+```
+
+Note that to make an Operator Catalog update, we didn't have to build any images -- just a new tar.gz file to point to. 
