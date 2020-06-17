@@ -97,3 +97,6 @@ oc process -f operator-registry-template.yaml -p NAME=${NAME} -p MANIFEST_ARCHIV
 ```
 
 Note that to make an Operator Catalog update, we didn't have to build any images -- just a new tar.gz file to point to. 
+
+### OCP4 Operator Catalog Management Utilities (for mirroring images)
+For some helpful APIs for managing Operator package manifest tar.gz archives, such as listing all image references in a tar.gz archive, or image mirroring capabilities, see the complementary [OCP4 Operator Catalog Management Utils](https://github.com/ldojo/ocp4-operator-catalog-management-utils) project
