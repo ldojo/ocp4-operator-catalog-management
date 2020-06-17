@@ -9,7 +9,7 @@ fi
 
 mkdir /tmp/manifests
 cd /tmp/manifests
-curl ${CURL_EAR_CREDS}  "${MANIFEST_ARCHIVE_URL}" | tar zxv 
+curl ${CURL_FETCH_CREDS}  "${MANIFEST_ARCHIVE_URL}" | tar zxv 
 
 if [ $? -ne 0 ]
 then

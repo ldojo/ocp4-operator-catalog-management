@@ -19,7 +19,7 @@ parameters:
   name: MANIFEST_ARCHIVE_URL
   required: true
 - description: "the Artifactory credentials, which will be passed to curl the archive, ex: -uadmin:password"
-  name: CURL_EAR_CREDS
+  name: CURL_FETCH_CREDS
   required: false
 - description: "The image tag of the operator-registry"
   name: "IMAGE"
@@ -73,8 +73,8 @@ objects:
           - name: HTTP_PROXY
           - name: HTTPS_PROXY
           - name: NO_PROXY
-          - name: CURL_EAR_CREDS
-            value: "${CURL_EAR_CREDS}"
+          - name: CURL_FETCH_CREDS
+            value: "${CURL_FETCH_CREDS}"
           - name: MANIFEST_ARCHIVE_URL
             value: "${MANIFEST_ARCHIVE_URL}" 
           image: ${IMAGE} 
