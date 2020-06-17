@@ -18,5 +18,4 @@ RUN chmod a+x /opt/scripts/initialize
 EXPOSE 50051
 
 
-ENTRYPOINT ["/opt/scripts/initialize", "$EAR_OPERATOR_MANIFESTS_URL"]
-
+ENTRYPOINT ["/opt/scripts/initialize", "$MANIFEST_ARCHIVE_URL"]

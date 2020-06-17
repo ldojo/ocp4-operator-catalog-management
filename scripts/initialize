@@ -1,15 +1,15 @@
 #!/bin/bash
 set -x
 
-if [ -z "$EAR_OPERATOR_MANIFESTS_URL" ]
+if [ -z "$MANIFEST_ARCHIVE_URL" ]
 then 
-	echo "\$EAR_OPERATOR_MANIFESTS_URL is not set. It is needed to fetch the operator manifests from EAR. cannot proceed, exiting"
+	echo "\$MANIFEST_ARCHIVE_URL is not set. It is needed to fetch the operator manifests from EAR. cannot proceed, exiting"
 	exit 1
 fi
 
 mkdir /tmp/manifests
 cd /tmp/manifests
-curl ${CURL_EAR_CREDS}  "${EAR_OPERATOR_MANIFESTS_URL}" | tar zxv 
+curl ${CURL_EAR_CREDS}  "${MANIFEST_ARCHIVE_URL}" | tar zxv 
 
 if [ $? -ne 0 ]
 then

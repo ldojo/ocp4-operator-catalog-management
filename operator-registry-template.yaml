@@ -16,7 +16,7 @@ parameters:
   generate: expression
   from: "[a-zA-Z0-9]{5}"
 - description: "The URL of the .tar.gz file containing operator manifests in Artifactory"
-  name: EAR_OPERATOR_MANIFESTS_URL
+  name: MANIFEST_ARCHIVE_URL
   required: true
 - description: "the Artifactory credentials, which will be passed to curl the archive, ex: -uadmin:password"
   name: CURL_EAR_CREDS
@@ -75,8 +75,8 @@ objects:
           - name: NO_PROXY
           - name: CURL_EAR_CREDS
             value: "${CURL_EAR_CREDS}"
-          - name: EAR_OPERATOR_MANIFESTS_URL
-            value: "${EAR_OPERATOR_MANIFESTS_URL}" 
+          - name: MANIFEST_ARCHIVE_URL
+            value: "${MANIFEST_ARCHIVE_URL}" 
           image: ${IMAGE} 
           imagePullPolicy: Always
           livenessProbe:
