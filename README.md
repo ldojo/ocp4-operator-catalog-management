@@ -33,7 +33,7 @@ NOTE: we do this pre-req step to build the ose-operator-registry image only *onc
 
 #### Day 1: 
 
-Suppose you want to start with an Operator catalog of all of the current Red Hat Operators. You can fetch all of the operators' package manifests like so, to a directory named `redhat-manifests`:
+Suppose you want to start with an Operator catalog of all of the current Red Hat Operators. You can fetch all of the "redhat-operators" category package manifests like so, to a directory named `redhat-manifests`:
 ```
 oc adm catalog build --appregistry-org=redhat-operators --manifest-dir=./redhat-manifests
 ```
