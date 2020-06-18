@@ -90,7 +90,7 @@ tar zcvf operator-catalog-v1.0.1.tar.gz redhat-manifests
 curl -umyuser:mypassword -T operator-catalog-v1.0.1.tar.gz "http://artifactory-host:<port>/artifactory/ocp-catalog-dev/operator-catalog-v1.0.1.tar.gz"
 ```
 
-3. If the operator catalog is already running in the target Openshift Cluster, as we deployed in on Day 1, there is no need to delete the CatalogSource/Deployment/Service we created -- just update the Deployment's MANIFEST_ARCHIVE_URL environment variable via CLI or UI Console. The Rolling Deployment will spin up a new pod pointing to our new tar.gz file, and load the new listing. If you're deploying to a new Openshift Cluster where the catalog has not bee deployed yet, just run the same command but pointing to the v1.0.1 archive with 
+3. If the operator catalog is already running in the target Openshift Cluster, as we deployed in on Day 1, there is no need to delete the CatalogSource/Deployment/Service we created -- just update the Deployment's MANIFEST_ARCHIVE_URL environment variable via CLI or UI Console. The Rolling Deployment will spin up a new pod pointing to our new tar.gz file, and load the new listing. If you're deploying to a new Openshift Cluster where the catalog has not been deployed yet, just run the same command but pointing to the v1.0.1 archive with 
 ```
 MANIFEST_ARCHIVE_URL=http://artifactory-host:<port>/artifactory/ocp-catalog-dev/operator-catalog-v1.0.1.tar.gz
 oc process -f operator-registry-template.yaml -p NAME=${NAME} -p MANIFEST_ARCHIVE_URL="${MANIFEST_ARCHIVE_URL}" -p CURL_FETCH_CREDS="${CURL_FETCH_CREDS}" -p IMAGE=${OP_CATALOG_IMAGE} | oc create -f -
