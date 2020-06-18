@@ -38,7 +38,7 @@ Suppose you want to start with an Operator catalog of all of the current Red Hat
 oc adm catalog build --appregistry-org=redhat-operators --manifest-dir=./redhat-manifests
 ```
 
-The result will be a list of directories inside the `redhat-manifests` dir, one for each operator. Each operator directory contains "package manifests", which are basically the CusterServiceVersion and CustomResourceDefinition Yaml files fo that operator. Thes Yaml content is all that Openshift needs to be able to install the Operator, and manage it via OLM. For more information on what CSVs and CRDs and what the Operator Lifecycle Manager workflow is, see the [official docs](https://docs.openshift.com/container-platform/4.3/operators/understanding_olm/olm-understanding-olm.html)
+The result will be a list of directories inside the `redhat-manifests` dir, one for each operator. Each operator directory contains "package manifests", which are basically the CusterServiceVersion and CustomResourceDefinition Yaml files fo that operator. This Yaml content is all that Openshift needs to be able to install the Operator, and manage it via OLM. For more information on what CSVs and CRDs and what the Operator Lifecycle Manager workflow is, see the [official docs](https://docs.openshift.com/container-platform/4.3/operators/understanding_olm/olm-understanding-olm.html)
 
 Next, we are going to tar/gz our `redhat-manifests` directory:
 ```
