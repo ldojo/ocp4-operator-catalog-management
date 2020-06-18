@@ -29,7 +29,7 @@ You can of course change those as args to the docker/podman build, particularly 
 
 With the image built, push it to the proper docker registry where an Openshift deployment will be able to pull it. 
 
-NOTE: we do this pre-req step to build the ose-operator-registry image only once. once it is deployed, we don't need to rebuild it. It acts as a "container" for the operator listing the OperatorHub interface will provide, but we won't need to rebuild it to change the listing of operators. We point the container to the proper tar.gz package manifest archive to fetch and load instead. 
+NOTE: we do this pre-req step to build the ose-operator-registry image only *once*. Once it is deployed, we don't need to rebuild it. It acts as a "container" for the operator listing the OperatorHub interface will provide, but we won't need to rebuild it to change the listing of operators. We point the container to the proper tar.gz package manifest archive to fetch and load instead. 
 
 #### Day 1: 
 
