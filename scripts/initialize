@@ -4,6 +4,7 @@ then
 	set -x
 fi
 
+#this variable will be used to track whether the .tar.gz in Artifactory has changed or not periodically (LMT-LastModifiedTime)
 ARTIFACT_LMT="n/a"
 
 if [ -z "$ARTIFACTORY_BASE_URL" ]
@@ -18,12 +19,15 @@ then
         exit 1
 fi
 
+#loop indefinitely, checking whether the tar.gz file has been updated in ARtifactory
+#If it has, reload the grpc server. Otherwise, keep looping
 while :
 do
 	OLD_ARTIFACT_LMT="${ARTIFACT_LMT}"
-
+        #fetch the LMT of the .tar.gz file in Artifactory
 	ARTIFACT_LMT=`curl -s ${CURL_FETCH_CREDS} "${ARTIFACTORY_BASE_URL}/api/storage/${ARTIFACTORY_ARTIFACT_PATH}?lastModified" | jq -r .lastModified`
 
+	#if it has changed, reload the grpc server catalog
 	if [ "${OLD_ARTIFACT_LMT}" != "${ARTIFACT_LMT}" ] 
 	then
 	   kill %1 2> /dev/null
@@ -44,5 +48,6 @@ do
 
 	   /bin/registry-server --database /tmp/bundles.db &
 	fi
-        sleep 15
+	#repeat every 60 seconds
+        sleep 60
 done

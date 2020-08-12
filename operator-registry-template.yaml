@@ -15,8 +15,14 @@ parameters:
   name: RANDOM
   generate: expression
   from: "[a-zA-Z0-9]{5}"
-- description: "The URL of the .tar.gz file containing operator manifests in Artifactory"
-  name: MANIFEST_ARCHIVE_URL
+- description: "if set, logs will have debug level output from the bash script controlling the registry server"
+  name: DEBUG_BASH
+  required: false
+- description: "The base URL of the Artifactory instance. This will be use to add '/api/*' for api calls, and to append the .tar.gz path to"
+  name: ARTIFACTORY_BASE_URL
+  required: true
+- description: "The Path of the .tar.gz file in Artifactory. This value will be concatenated with ARTIFACTORY_BASE_URL to create the complete URL of the archive in Artifactory"
+  name: ARTIFACTORY_ARTIFACT_PATH
   required: true
 - description: "the Artifactory or other file/archive repo credentials, which will be passed to curl the archive, ex: -uadmin:password. Leave blank if no necessary"
   name: CURL_FETCH_CREDS
@@ -75,8 +81,12 @@ objects:
           - name: NO_PROXY
           - name: CURL_FETCH_CREDS
             value: "${CURL_FETCH_CREDS}"
-          - name: MANIFEST_ARCHIVE_URL
-            value: "${MANIFEST_ARCHIVE_URL}"
+          - name: ARTIFACTORY_BASE_URL
+            value: "${ARTIFACTORY_BASE_URL}"
+          - name: ARTIFACTORY_ARTIFACT_PATH
+            value: "${ARTIFACTORY_ARTIFACT_PATH}"
+          - name: DEBUG_BASH
+            value: "${DEBUG_BASH}"
           image: ${IMAGE}
           imagePullPolicy: Always
           livenessProbe:
