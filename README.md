@@ -60,8 +60,12 @@ oc project openshift-marketplace;
 NAME=catalog-dev
 
 #this is the same URL as we pushed our tar.gz archive to in our earlier step above
-MANIFEST_ARCHIVE_URL=http://artifactory-host:<port>/artifactory/ocp-catalog-dev/operator-catalog-v1.0.0.tar.gz
-#the mechanism will fetch $MANIFEST_ARCHIVE_URL via curl, and if your artifact repo needs credentials to do so, set them here. Leave "" if no credentials are needed
+ARTIFACTORY_BASE_URL=http://artifactory-host:<port>/artifactory
+#this is the "path" of the .tar.gz file in ARtifactory
+ARTIFACTORY_ARTIFACT_PATH=ocp-catalog-dev/operator-catalog-v1.0.0.tar.gz
+#Note that ${ARTIFACTORY_BASE_URL}/${ARTIFACTORY_ARTIFACT_PATH} constitues the entire URL of the .tar.gz in Artifactory -- the script will perform this concatenation. It needs the ARTIFACTORY_BASE_URL as a separate variable because it will curl the API at ${ARTIFACTORY_BASE_URL}/api/* as well
+
+#the mechanism will fetch ${ARTIFACTORY_BASE_URL}/${ARTIFACTORY_ARTIFACT_PATH} via curl, and if your artifact repo needs credentials to do so, set them here. Leave "" if no credentials are needed
 CURL_FETCH_CREDS=""
 
 #this is the location of the operator catalog image that we pushed to in our Pre-reqs step above. make sure Pods in the openshift-marketplace namespace can pull this image beforehand
@@ -70,7 +74,7 @@ OP_CATALOG_IMAGE=your-repo/designated-path/operator-catalog:vX.Y.Z
 
 With that in palce, lets deploy:
 ```
-oc process -f operator-registry-template.yaml -p NAME=${NAME} -p MANIFEST_ARCHIVE_URL="${MANIFEST_ARCHIVE_URL}" -p CURL_FETCH_CREDS="${CURL_FETCH_CREDS}" -p IMAGE=${OP_CATALOG_IMAGE} | oc create -f -
+oc process -f operator-registry-template.yaml -p NAME=${NAME} -p ARTIFACTORY_BASE_URL="${ARTIFACTORY_BASE_URL}" ARTIFACTORY_ARTIFACT_PATH="${ARTIFACTORY_ARTIFACT_PATH}" -p CURL_FETCH_CREDS="${CURL_FETCH_CREDS}" -p IMAGE=${OP_CATALOG_IMAGE} | oc create -f -
 ```
 
 You should see a Service, CatalogSource, and Deployment (with corresponding Pod) spin up in the `openshift-marketplace`. 
@@ -97,6 +101,7 @@ oc process -f operator-registry-template.yaml -p NAME=${NAME} -p MANIFEST_ARCHIV
 ```
 
 Note that to make an Operator Catalog update, we didn't have to build any images -- just a new tar.gz file to point to. 
-
+Also, be aware that if you push your new catalog to the *same* Artifactory URL http://artifactory-host:<port>/artifactory/ocp-catalog-dev/operator-catalog-v1.0.0.tar.gz, overwriting the previous v1.0.0.tar.gz file, the catalog deployment will automatically reload itself with its contents. Every 60 seconds the catalog deployment checks to see if the ${ARTIFACTORY_BASE_URL}/${ARTIFACTORY_ARTIFACT_PATH} has been updated in Artifactory (by checking the LastModifiedTime of the artifact via Artifactory API), and if so, fetches the new file and reloads itself with its contents.
+  
 ### OCP4 Operator Catalog Management Utilities (for mirroring images)
 For some helpful APIs for managing Operator package manifest tar.gz archives, such as listing all image references in a tar.gz archive, or image mirroring capabilities, see the complementary [OCP4 Operator Catalog Management Utils](https://github.com/ldojo/ocp4-operator-catalog-management-utils) project
