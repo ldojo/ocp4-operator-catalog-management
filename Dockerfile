@@ -18,4 +18,4 @@ RUN chmod a+x /opt/scripts/* && yum install -y jq
 EXPOSE 50051
 
 
-ENTRYPOINT ["/opt/scripts/artifactory_initialize", "$MANIFEST_ARCHIVE_URL"]
+ENTRYPOINT ["/opt/scripts/initialize", "$MANIFEST_ARCHIVE_URL"]
