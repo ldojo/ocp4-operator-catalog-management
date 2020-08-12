@@ -7,13 +7,15 @@ FROM ${UBI_OR_BASE_IMAGE}
 
 LABEL maintainer="Lev Shulman <lshulman@redhat.com>"
 
+
+
 COPY --from=builder /bin/initializer /bin/initializer
 COPY --from=builder /usr/bin/registry-server /bin/registry-server
 COPY --from=builder /bin/grpc_health_probe /bin/grpc_health_probe
 
 COPY scripts /opt/scripts
 
-RUN chmod a+x /opt/scripts/initialize
+RUN chmod a+x /opt/scripts/initialize && yum install -y jq
 
 EXPOSE 50051
 
