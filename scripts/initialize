@@ -1,22 +1,53 @@
 #!/bin/bash
-set -x
-
-if [ -z "$MANIFEST_ARCHIVE_URL" ]
-then 
-	echo "\$MANIFEST_ARCHIVE_URL is not set. It is needed to fetch the operator manifests from EAR. cannot proceed, exiting"
-	exit 1
-fi
-
-mkdir /tmp/manifests
-cd /tmp/manifests
-curl ${CURL_FETCH_CREDS}  "${MANIFEST_ARCHIVE_URL}" | tar zxv 
-
-if [ $? -ne 0 ]
+if [ -n "$DEBUG_BASH" ]
 then
-	echo "fetching the tar gz archive and unpacking it failed. exiting"
+	set -x
+fi
+
+#this variable will be used to track whether the .tar.gz in Artifactory has changed or not periodically (LMT-LastModifiedTime)
+ARTIFACT_LMT="n/a"
+
+if [ -z "$ARTIFACTORY_BASE_URL" ]
+then 
+	echo "\$ARTIFACTORY_BASE_URL is not set. It is needed to fetch the operator manifests from EAR. cannot proceed, exiting"
 	exit 1
 fi
 
-/bin/initializer -o /tmp/bundles.db
+if [ -z "$ARTIFACTORY_ARTIFACT_PATH" ]
+then
+        echo "\$ARTIFACTORY_ARTIFACT_PATH is not set. It is needed to fetch the operator manifests from EAR. cannot proceed, exiting"
+        exit 1
+fi
 
-/bin/registry-server --database /tmp/bundles.db
+#loop indefinitely, checking whether the tar.gz file has been updated in ARtifactory
+#If it has, reload the grpc server. Otherwise, keep looping
+while :
+do
+	OLD_ARTIFACT_LMT="${ARTIFACT_LMT}"
+        #fetch the LMT of the .tar.gz file in Artifactory
+	ARTIFACT_LMT=`curl -s ${CURL_FETCH_CREDS} "${ARTIFACTORY_BASE_URL}/api/storage/${ARTIFACTORY_ARTIFACT_PATH}?lastModified" | jq -r .lastModified`
+
+	#if it has changed, reload the grpc server catalog
+	if [ "${OLD_ARTIFACT_LMT}" != "${ARTIFACT_LMT}" ] 
+	then
+	   kill %1 2> /dev/null
+	   echo "fetching new package manifest archive, modified at ${ARTIFACT_LMT}"
+
+	   rm -rf /tmp/manifests 2> /dev/null
+	   mkdir /tmp/manifests
+	   cd /tmp/manifests
+	   curl -s ${CURL_FETCH_CREDS}  "${ARTIFACTORY_BASE_URL}/${ARTIFACTORY_ARTIFACT_PATH}" | tar zxv 
+
+	   if [ $? -ne 0 ]
+	   then
+		echo "fetching the tar gz archive and unpacking it failed. exiting"
+		exit 1
+	   fi
+           rm -rf /tmp/bundles.db 2> /dev/null
+	   /bin/initializer -o /tmp/bundles.db
+
+	   /bin/registry-server --database /tmp/bundles.db &
+	fi
+	#repeat every 60 seconds
+        sleep 60
+done
