@@ -72,8 +72,12 @@ CURL_FETCH_CREDS=""
 OP_CATALOG_IMAGE=your-repo/designated-path/operator-catalog:vX.Y.Z
 ```
 
-With that in palce, lets deploy:
+With that in palce, we disable the default CatalogSource in OCP4, and deploy:
 ```
+#this disables the default CatalogSource
+oc patch OperatorHub cluster --type json \
+    -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
+#instantiate our Openshift template, to deploy our own CatalogSource referencing the Operators we coalesced above in our tar.gz file    
 oc process -f operator-registry-template.yaml -p NAME=${NAME} -p ARTIFACTORY_BASE_URL="${ARTIFACTORY_BASE_URL}" ARTIFACTORY_ARTIFACT_PATH="${ARTIFACTORY_ARTIFACT_PATH}" -p CURL_FETCH_CREDS="${CURL_FETCH_CREDS}" -p IMAGE=${OP_CATALOG_IMAGE} | oc create -f -
 ```
 
