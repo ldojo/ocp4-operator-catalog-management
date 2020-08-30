@@ -44,7 +44,7 @@ do
 		exit 1
 	   fi
            rm -rf /tmp/bundles.db 2> /dev/null
-	   /bin/initializer -o /tmp/bundles.db
+	   /bin/initializer --permissive -o /tmp/bundles.db
 
 	   /bin/registry-server --database /tmp/bundles.db &
 	fi
