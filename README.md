@@ -49,7 +49,7 @@ and then push that archive to a location in your Artifactory/nexus repo that mak
 
 curl -umyuser:mypassword -T operator-catalog-v1.0.0.tar.gz "http://artifactory-host:<port>/artifactory/ocp-catalog-dev/operator-catalog-v1.0.0.tar.gz"
 
-We are now ready to deploy are operator list (note that it is assumed that any `CatalogSource`s on the target Openshift 4 cluster are disabled or removed):
+We are now ready to deploy our operator list (note that it is assumed that any `CatalogSource`s on the target Openshift 4 cluster are disabled or removed):
 
 ```
 oc project openshift-marketplace;
