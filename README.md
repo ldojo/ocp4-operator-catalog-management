@@ -1,7 +1,7 @@
 
 ## Specifications
 
-This mechanism has been tested with Openshift 4.3 and 4.4. It is assumed to also work with Openshift 4.(x < 3), but has not been tested.
+This mechanism has been tested with Openshift 4.3 and 4.4 and 4.5. It is assumed to also work with Openshift 4.(x < 3), but has not been tested.
 
 ## Purpose of this project
 
